@@ -1,0 +1,37 @@
+# Virtual environment
+env/
+venv/
+ENV/
+.venv/
+
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Editor/IDE
+.vscode/
+*.swp
+*.swo
+*.bak
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Model/data
+data.pkl
+*.h5
+*.pb
+*.weights
+
+# Jupyter checkpoints (kalau pakai notebook)
+.ipynb_checkpoints/
+
+# Streamlit uploads
+.streamlit/
+
+# Logs or temp
+*.log
+*.tmp

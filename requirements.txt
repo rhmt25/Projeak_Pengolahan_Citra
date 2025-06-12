@@ -1,8 +1,9 @@
 streamlit
+python_version == "3.10"
 opencv-python
 numpy==1.23.5
-pillow
 scipy
 tensorflow==2.12.0
 keras==2.12.0
 keras-facenet==0.3.2
+

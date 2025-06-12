@@ -1,9 +1,10 @@
 import streamlit as st
 import numpy as np
+import os
+os.environ['OPENCV_IO_ENABLE_OPENEXR'] = '1'
 import cv2
 from PIL import Image
 from KenaliWajahHaar import kenali_wajah
-import os
 from BuatSignatureHaar2 import buat_signature_from_folder
 
 # ✅ Jalankan hanya sekali saat data.pkl belum ada

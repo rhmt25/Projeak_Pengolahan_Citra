@@ -1,3 +1,4 @@
+pip
 streamlit==0.70.0
 opencv-python-headless
 Keras==2.4.3

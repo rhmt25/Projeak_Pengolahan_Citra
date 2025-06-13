@@ -1,11 +1,11 @@
 import streamlit as st
 import numpy as np
-import os
-os.environ['OPENCV_IO_ENABLE_OPENEXR'] = '1'
 import cv2
 from PIL import Image
 from KenaliWajahHaar import kenali_wajah
+import os
 from BuatSignatureHaar2 import buat_signature_from_folder
+
 
 # ✅ Jalankan hanya sekali saat data.pkl belum ada
 if not os.path.exists("data.pkl"):
@@ -55,7 +55,8 @@ if method == "Tambah Data Wajah":
 
 
 
-elif method == "Deteksi Wajah":
+# Di bagian Deteksi Wajah pada app.py
+if method == "Deteksi Wajah":
     st.subheader("📸 Pilih metode input:")
     input_mode = st.radio("Metode Input", ["Upload Gambar", "Gunakan Kamera"])
 
@@ -69,9 +70,13 @@ elif method == "Deteksi Wajah":
                 image_np = np.array(image)
                 image_bgr = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
                 name, result_image = kenali_wajah(image_bgr)
-
-                st.subheader(f"Hasil Deteksi: {name}")
-                st.image(cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB), use_column_width=True)
+                
+                if name == "Wajah tidak terdeteksi":
+                    st.subheader("Hasil Deteksi: Wajah tidak terdeteksi")
+                    st.image(cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB), use_column_width=True)
+                else:
+                    st.subheader(f"Hasil Deteksi: {name}")
+                    st.image(cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB), use_column_width=True)
 
     elif input_mode == "Gunakan Kamera":
         camera_file = st.camera_input("Ambil gambar dari kamera")
@@ -82,6 +87,10 @@ elif method == "Deteksi Wajah":
                 image_np = np.array(image)
                 image_bgr = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
                 name, result_image = kenali_wajah(image_bgr)
-
-                st.subheader(f"Hasil Deteksi: {name}")
-                st.image(cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB), use_column_width=True)
+                
+                if name == "Wajah tidak terdeteksi":
+                    st.subheader("Hasil Deteksi: Wajah tidak terdeteksi")
+                    st.image(cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB), use_column_width=True)
+                else:
+                    st.subheader(f"Hasil Deteksi: {name}")
+                    st.image(cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB), use_column_width=True)

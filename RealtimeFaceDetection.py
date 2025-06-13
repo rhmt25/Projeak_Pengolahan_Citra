@@ -4,14 +4,19 @@ from KenaliWajahHaar import kenali_wajah
 import streamlit as st
 from PIL import Image
 
+import cv2
+import numpy as np
+from KenaliWajahHaar import kenali_wajah
+import streamlit as st
+
 def realtime_face_detection():
     st.title("🔴 Deteksi Wajah Real-Time")
     
-    # State untuk kontrol deteksi
+    # State management
     if 'detection_active' not in st.session_state:
         st.session_state.detection_active = False
     
-    # Tombol Start/Stop
+    # Tombol kontrol
     col1, col2 = st.columns(2)
     with col1:
         if not st.session_state.detection_active:
@@ -25,46 +30,64 @@ def realtime_face_detection():
                 st.session_state.detection_active = False
                 st.rerun()
     
-    # Placeholder untuk video stream
     frame_placeholder = st.empty()
     status_text = st.empty()
     
     if st.session_state.detection_active:
-        status_text.info("🟢 Deteksi aktif - Menghadap kamera...")
-        cap = cv2.VideoCapture(0)
+        # Coba akses kamera
+        cap = None
+        for i in range(4):  # Coba indeks 0-3
+            cap = cv2.VideoCapture(i, cv2.CAP_DSHOW)  # Gunakan CAP_DSHOW untuk Windows
+            if cap.isOpened():
+                break
+            if cap:
+                cap.release()
         
-        # Pengaturan kamera
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-        cap.set(cv2.CAP_PROP_FPS, 24)
+        if not cap or not cap.isOpened():
+            status_text.error("""
+            ❌ Kamera tidak dapat diakses. 
+            - Pastikan kamera terhubung
+            - Tidak digunakan aplikasi lain
+            - Coba refresh halaman
+            """)
+            st.session_state.detection_active = False
+            return
         
         try:
-            while st.session_state.detection_active and cap.isOpened():
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+            
+            while st.session_state.detection_active:
                 ret, frame = cap.read()
                 if not ret:
-                    status_text.error("Gagal mengambil frame dari kamera")
-                    break
+                    status_text.warning("Gagal membaca frame kamera")
+                    continue
                 
-                # Konversi warna dan deteksi wajah
+                # Proses deteksi
                 frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                names, result_frame = kenali_wajah(cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR))
+                names, result_frame = kenali_wajah(frame)
                 result_frame_rgb = cv2.cvtColor(result_frame, cv2.COLOR_BGR2RGB)
                 
-                # Tampilkan frame dengan deteksi
-                frame_placeholder.image(result_frame_rgb, channels="RGB", use_column_width=True)
+                # Tampilkan hasil
+                frame_placeholder.image(result_frame_rgb, channels="RGB", use_container_width=True)
                 
-                # Update status
-                if names[0] != "Wajah tidak terdeteksi":
-                    status_text.success(f"👥 {len(names)} wajah terdeteksi | {' | '.join(names)}")
+                if names[0] == "Wajah tidak terdeteksi":
+                    status_text.warning("👀 Mencari wajah...")
                 else:
-                    status_text.warning("❌ Tidak ada wajah terdeteksi")
+                    status_text.success(f"👥 Terdeteksi: {', '.join(names)}")
+                
+        except Exception as e:
+            status_text.error(f"Error: {str(e)}")
         
         finally:
-            cap.release()
+            if 'cap' in locals() and cap.isOpened():
+                cap.release()
             cv2.destroyAllWindows()
     
     else:
-        # Buat placeholder hitam sederhana
-        placeholder_image = np.zeros((480, 640, 3), dtype=np.uint8)
-        frame_placeholder.image(placeholder_image, caption="Kamera tidak aktif", use_column_width=True)
-        status_text.info("⏸️ Deteksi dihentikan - Tekan Mulai Deteksi untuk memulai")
+        # Tampilkan placeholder saat tidak aktif
+        placeholder = np.zeros((480, 640, 3), dtype=np.uint8)
+        cv2.putText(placeholder, "Kamera tidak aktif", (50, 240), 
+                   cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+        frame_placeholder.image(placeholder, use_container_width=True)
+        status_text.info("⏸️ Tekan 'Mulai Deteksi' untuk memulai")

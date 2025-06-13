@@ -18,7 +18,8 @@ st.title("PROYEK APLIKASI PENGENALAN WAJAH")
 st.sidebar.title("🔧 Pilih Metode")
 method = st.sidebar.selectbox("Metode Pengolahan", [
     "Tambah Data Wajah",
-    "Deteksi Wajah"
+    "Deteksi Wajah",
+    "Deteksi Wajah Real-Time"
 ])
 
 if method == "Tambah Data Wajah":
@@ -56,7 +57,7 @@ if method == "Tambah Data Wajah":
 
 
 # Di bagian Deteksi Wajah pada app.py
-if method == "Deteksi Wajah":
+elif method == "Deteksi Wajah":
     st.subheader("📸 Pilih metode input:")
     input_mode = st.radio("Metode Input", ["Upload Gambar", "Gunakan Kamera"])
 
@@ -69,13 +70,15 @@ if method == "Deteksi Wajah":
             if st.button("Deteksi Wajah"):
                 image_np = np.array(image)
                 image_bgr = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
-                name, result_image = kenali_wajah(image_bgr)
+                names, result_image = kenali_wajah(image_bgr)
                 
-                if name == "Wajah tidak terdeteksi":
+                if names[0] == "Wajah tidak terdeteksi":
                     st.subheader("Hasil Deteksi: Wajah tidak terdeteksi")
                     st.image(cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB), use_column_width=True)
                 else:
-                    st.subheader(f"Hasil Deteksi: {name}")
+                    st.subheader("Hasil Deteksi:")
+                    for i, name in enumerate(names, 1):
+                        st.write(f"Wajah {i}: {name}")
                     st.image(cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB), use_column_width=True)
 
     elif input_mode == "Gunakan Kamera":
@@ -86,11 +89,17 @@ if method == "Deteksi Wajah":
             if st.button("Deteksi Wajah"):
                 image_np = np.array(image)
                 image_bgr = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
-                name, result_image = kenali_wajah(image_bgr)
+                names, result_image = kenali_wajah(image_bgr)
                 
-                if name == "Wajah tidak terdeteksi":
+                if names[0] == "Wajah tidak terdeteksi":
                     st.subheader("Hasil Deteksi: Wajah tidak terdeteksi")
                     st.image(cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB), use_column_width=True)
                 else:
-                    st.subheader(f"Hasil Deteksi: {name}")
+                    st.subheader("Hasil Deteksi:")
+                    for i, name in enumerate(names, 1):
+                        st.write(f"Wajah {i}: {name}")
                     st.image(cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB), use_column_width=True)
+
+elif method == "Deteksi Wajah Real-Time":
+    from RealtimeFaceDetection import realtime_face_detection
+    realtime_face_detection()

@@ -18,8 +18,7 @@ st.title("PROYEK APLIKASI PENGENALAN WAJAH")
 st.sidebar.title("🔧 Pilih Metode")
 method = st.sidebar.selectbox("Metode Pengolahan", [
     "Tambah Data Wajah",
-    "Deteksi Wajah",
-    "Deteksi Wajah Real-Time"
+    "Deteksi Wajah"
 ])
 
 if method == "Tambah Data Wajah":
@@ -99,7 +98,3 @@ elif method == "Deteksi Wajah":
                     for i, name in enumerate(names, 1):
                         st.write(f"Wajah {i}: {name}")
                     st.image(cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB), use_column_width=True)
-
-elif method == "Deteksi Wajah Real-Time":
-    from RealtimeFaceDetection import realtime_face_detection
-    realtime_face_detection()
